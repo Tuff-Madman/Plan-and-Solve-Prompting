@@ -27,7 +27,7 @@ def read_json_data(filename):
 datas=read_json_data(data_path)
 print(len(datas))
 random.shuffle(datas)
-divide=int(len(datas)/10)
+divide = len(datas) // 10
 
 trainset=datas[:divide*8]
 validset=datas[divide*8:divide*9]

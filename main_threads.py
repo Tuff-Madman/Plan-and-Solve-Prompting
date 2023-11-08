@@ -13,12 +13,12 @@ from utils import write_json, print_now, mkpath, print_exp, load_data
 
 now = print_now(1).split(' ')[0].replace('/', '-')
 
-Result_Folder = 'result/{}'.format(now)
+Result_Folder = f'result/{now}'
 mkpath('result')
 mkpath(Result_Folder)
 mkpath(f'{Result_Folder}/{args.dataset}')
 
-Log_Folder = 'log/{}'.format(now)
+Log_Folder = f'log/{now}'
 mkpath('log')
 mkpath(Log_Folder)
 mkpath(f'{Log_Folder}/{args.dataset}')

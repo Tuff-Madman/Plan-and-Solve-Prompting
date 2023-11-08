@@ -27,16 +27,8 @@ def decoder_for_gpt3(args, input, max_length, apikey):
     )
     if max_length == 32 or not args.SC:
         return response["choices"][0]['text']
-    elif max_length != 32 and args.SC:
-        text = response["choices"]
-        tem_rational = []
-        for i in range(len(text)):
-            tem_rational.append(text[i]['text'])
-        return tem_rational
-    elif args.engine == 'code-davinci-002':
-        raise NotImplementedError('implement the code when running gpt3 engine: {}'.format(args.engine))
-    else:
-        raise NotImplementedError('implement the code when running gpt3 engine: {}'.format(args.engine))
+    text = response["choices"]
+    return [text[i]['text'] for i in range(len(text))]
 
 
 def basic_runner(args, inputs, max_length, apikey, max_retry=3):
