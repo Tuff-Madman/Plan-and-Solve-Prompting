@@ -4,9 +4,16 @@ from config import args
 
 
 def create_demo_text():
-    if args.demo_path == 'demos/svamp.json' or args.demo_path == 'demos/svamp_6.json' or args.demo_path == 'demos/gsm8k_6.json' \
-            or args.demo_path == 'demos/svamp_8_6.json' or args.demo_path == 'demos/svamp_4.json' or args.demo_path == 'demos/svamp_2.json' \
-            or args.demo_path == 'demos/auto_svamp_prompt/svamp_2prompt.json' or args.demo_path == 'demos/auto_svamp_prompt/gsm8k_2prompt.json':
+    if args.demo_path in [
+        'demos/svamp.json',
+        'demos/svamp_6.json',
+        'demos/gsm8k_6.json',
+        'demos/svamp_8_6.json',
+        'demos/svamp_4.json',
+        'demos/svamp_2.json',
+        'demos/auto_svamp_prompt/svamp_2prompt.json',
+        'demos/auto_svamp_prompt/gsm8k_2prompt.json',
+    ]:
         x, z, y = [], [], []
         with open(args.demo_path, encoding="utf-8") as f:
             json_data = json.load(f)
@@ -16,10 +23,11 @@ def create_demo_text():
                 z.append(line["rationale"])
                 y.append(line["pred_ans"])
         index_list = list(range(len(x)))
-        demo_text = ""
-        for i in index_list:
-            demo_text += x[i] + " " + z[i] + " " + \
-                         args.direct_answer_trigger_for_fewshot + " " + y[i] + ".\n\n"
+        demo_text = "".join(
+            f"{x[i]} {z[i]} {args.direct_answer_trigger_for_fewshot} {y[i]}"
+            + ".\n\n"
+            for i in index_list
+        )
     elif args.demo_path == 'demos/aqua.json':
         x, y, z, k = [], [], [], []
         with open(args.demo_path, encoding="utf-8") as f:
@@ -31,10 +39,16 @@ def create_demo_text():
                 z.append(line['rationale'])
                 k.append(line['pred_ans'])
             index_list = list(range(len(x)))
-            demo_text = ""
-            for i in index_list:
-                demo_text += x[i] + ' ' + y[i] + '\n' + \
-                             z[i] + args.direct_answer_trigger_for_fewshot + ' ' + k[i] + ".\n\n"
+            demo_text = "".join(
+                f'{x[i]} {y[i]}'
+                + '\n'
+                + z[i]
+                + args.direct_answer_trigger_for_fewshot
+                + ' '
+                + k[i]
+                + ".\n\n"
+                for i in index_list
+            )
     elif args.demo_path == 'demos/commonsenseqa.json':
         x, y, z, k = [], [], [], []
         with open(args.demo_path, encoding="utf-8") as f:
@@ -46,10 +60,16 @@ def create_demo_text():
                 z.append(line['rationale'])
                 k.append(line['pred_ans'])
             index_list = list(range(len(x)))
-            demo_text = ""
-            for i in index_list:
-                demo_text += x[i] + ' ' + y[i] + '\n' + \
-                             z[i] + ' So the answer is' + ' ' + k[i] + ".\n\n"
+            demo_text = "".join(
+                f'{x[i]} {y[i]}'
+                + '\n'
+                + z[i]
+                + ' So the answer is'
+                + ' '
+                + k[i]
+                + ".\n\n"
+                for i in index_list
+            )
     elif args.demo_path == 'demos/strategyqa.json':
         x, z, y = [], [], []
         with open(args.demo_path, encoding="utf-8") as f:
@@ -60,9 +80,10 @@ def create_demo_text():
                 z.append(line["rationale"])
                 y.append(line["pred_ans"])
         index_list = list(range(len(x)))
-        demo_text = ""
-        for i in index_list:
-            demo_text += x[i] + " " + z[i] + ' So the answer is' + " " + y[i] + ".\n\n"
+        demo_text = "".join(
+            f"{x[i]} {z[i]} So the answer is {y[i]}" + ".\n\n"
+            for i in index_list
+        )
     elif args.demo_path == 'demos/coin_flip.json':
         x, z, y = [], [], []
         with open(args.demo_path, encoding="utf-8") as f:
@@ -73,9 +94,10 @@ def create_demo_text():
                 z.append(line["rationale"])
                 y.append(line["pred_ans"])
         index_list = list(range(len(x)))
-        demo_text = ""
-        for i in index_list:
-            demo_text += x[i] + " " + z[i] + ' So the answer is' + " " + y[i] + ".\n\n"
+        demo_text = "".join(
+            f"{x[i]} {z[i]} So the answer is {y[i]}" + ".\n\n"
+            for i in index_list
+        )
     elif args.demo_path == 'demos/last_letters.json':
         x, z, y = [], [], []
         with open(args.demo_path, encoding="utf-8") as f:
@@ -86,11 +108,9 @@ def create_demo_text():
                 z.append(line["rationale"])
                 y.append(line["pred_ans"])
         index_list = list(range(len(x)))
-        demo_text = ""
-        for i in index_list:
-            demo_text += x[i] + " " + z[i] + ' The answer is' + " " + y[i] + ".\n\n"
-    else:
-        pass
+        demo_text = "".join(
+            f"{x[i]} {z[i]} The answer is {y[i]}" + ".\n\n" for i in index_list
+        )
     return demo_text
 
 
@@ -128,27 +148,26 @@ def get_prompt():
     if args.learning_type == 'zero_shot':
         try:
             demos = None
-            return demos, eval('prompt_{}'.format(args.prompt_id))
+            return demos, eval(f'prompt_{args.prompt_id}')
         except NameError as e:
-            raise NameError('can\'t find prompt_id: {}'.format(args.prompt_id))
+            raise NameError(f"can\'t find prompt_id: {args.prompt_id}")
     elif args.learning_type == 'few_shot':
-        demo_file = Few_Shot_Demo_Folder + f'{args.domain}_prompt_{args.prompt_id}.json'
+        demo_file = f'{Few_Shot_Demo_Folder}{args.domain}_prompt_{args.prompt_id}.json'
         if args.dataset.lower() in ['aqua']:
-            demo_file = Few_Shot_Demo_Folder + f'{args.domain}_prompt_{args.prompt_id}_choices.json'
+            demo_file = f'{Few_Shot_Demo_Folder}{args.domain}_prompt_{args.prompt_id}_choices.json'
         try:
             f = open(demo_file, 'r', encoding='utf-8')
             demos_list = json.load(f)
             demos_list = demos_list['demo']
             demos = '\n'.join(demos_list)
-            return demos, eval('prompt_{}'.format(args.prompt_id))
+            return demos, eval(f'prompt_{args.prompt_id}')
         except NameError as e:
-            raise NameError('can\'t find prompt_id: {}'.format(args.prompt_id))
+            raise NameError(f"can\'t find prompt_id: {args.prompt_id}")
         except FileNotFoundError as e:
-            raise FileNotFoundError('can\'t find the demo file: {}'.format(demo_file))
+            raise FileNotFoundError(f"can\'t find the demo file: {demo_file}")
     else:
-        raise ValueError('not support learning_type: {}'.format(args.learning_type))
+        raise ValueError(f'not support learning_type: {args.learning_type}')
 
 
 def construct_input(prompt, text):
-    inputs = 'Q:' + text + "\nA: " + prompt
-    return inputs
+    return f'Q:{text}' + "\nA: " + prompt

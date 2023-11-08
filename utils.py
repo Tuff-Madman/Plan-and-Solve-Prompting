@@ -19,14 +19,10 @@ def print_now(return_flag=0):
         print(now)
     elif return_flag == 1:
         return now
-    else:
-        pass
 
 
 def print_exp(args, return_flag=0):
-    info = ''
-    for k, v in vars(args).items():
-        info += '{}:{}\n'.format(k, v)
+    info = ''.join(f'{k}:{v}\n' for k, v in vars(args).items())
     print('---------------experiment args---------------')
     print(info)
     print('---------------------------------------------')
@@ -34,8 +30,6 @@ def print_exp(args, return_flag=0):
         return
     elif return_flag == 1:
         return info
-    else:
-        pass
 
 
 def load_data(args):
@@ -43,7 +37,11 @@ def load_data(args):
     questions = []
     answers = []
     ids = []
-    datapath = args.datapath if args.datapath else '{}/{}/{}.json'.format(Dataset_Folder, args.dataset, args.dataset)
+    datapath = (
+        args.datapath
+        if args.datapath
+        else f'{Dataset_Folder}/{args.dataset}/{args.dataset}.json'
+    )
     if args.dataset == 'gsm8k_zct_8':
         questions, rational, answers = [], [], []
         datapath = 'result/ours/text003/gsm8k_zct_1_10_8.json'
@@ -56,7 +54,7 @@ def load_data(args):
                 questions.append(q)
                 rational.append(r)
                 answers.append(a)
-                ids.append('temp_{}'.format(idx))
+                ids.append(f'temp_{idx}')
         if args.test_num == 'full':
             return questions, rational, answers
         else:
@@ -87,25 +85,22 @@ def load_data(args):
                 elif args.dataset.lower() == 'strategyqa':
                     q = line["input"].strip()
                     a = int(line["target_scores"]["Yes"])
-                    if a == 1:
-                        a = "yes"
-                    else:
-                        a = "no"
-                    id = 'temp_{}'.format(idx)
+                    a = "yes" if a == 1 else "no"
+                    id = f'temp_{idx}'
                 elif args.dataset.lower() in ['coin_flip', 'last_letters']:
                     q = line["question"]
                     a = line["answer"]
-                    id = 'temp_{}'.format(idx)
+                    id = f'temp_{idx}'
                 elif args.dataset.lower() in ["multiarith", 'addsub', 'singleeq']:
                     q = line['sQuestion']
                     a = float(line['lSolutions'][0])
-                    id = 'temp_{}'.format(idx)
+                    id = f'temp_{idx}'
                 elif args.dataset.lower() in ['gsm8k', 'gsm8k_sorted', 'examples', 'examples']:
                     q = line['question']
                     a = float(line['answer'])
-                    id = 'temp_{}'.format(idx)
+                    id = f'temp_{idx}'
                 else:
-                    raise ValueError('not support dataset: {}'.format(args.dataset))
+                    raise ValueError(f'not support dataset: {args.dataset}')
                 questions.append(q)
                 answers.append(a)
                 ids.append(id)
@@ -121,7 +116,7 @@ def load_data(args):
                     choice = "Answer Choices:" + choice
                     q = json_res["question"].strip() + ' ' + choice
                     a = json_res["correct"]
-                    id = 'temp_{}'.format(idx)
+                    id = f'temp_{idx}'
                 elif args.dataset.lower() == 'commonsenseqa':
                     json_res = decoder.raw_decode(line)[0]
                     choice = "Answer Choices:"
@@ -132,9 +127,9 @@ def load_data(args):
                         choice += c["text"]
                     q = json_res["question"]["stem"].strip() + " " + choice
                     a = json_res["answerKey"]
-                    id = 'temp_{}'.format(idx)
+                    id = f'temp_{idx}'
                 else:
-                    raise ValueError('not support dataset: {}'.format(args.dataset))
+                    raise ValueError(f'not support dataset: {args.dataset}')
                 questions.append(q)
                 answers.append(a)
                 ids.append(id)
@@ -284,9 +279,8 @@ def load_data(args):
 
 
 def write_json(data, path):
-    f = open(path, mode='a', encoding='utf-8')
-    json.dump(data, f, indent=4, ensure_ascii=False)
-    f.close()
+    with open(path, mode='a', encoding='utf-8') as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
 # def fix_seed(seed):
 #     # random
